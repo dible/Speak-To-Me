@@ -3,6 +3,12 @@ package org.cmi.wikisearch.services;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+// modified by Ning start 1
+import java.util.Arrays;
+import java.util.Set;
+import java.util.List;
+import org.apache.lucene.analysis.CharArraySet;
+// modified by Ning end 1
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,11 +30,32 @@ public class LuceneSearchService implements SearchService {
 	private IndexSearcher isearcher;
 	private String [] fields;
 	private Analyzer analyzer;
+	// modified by Ning start 2
+	public static Set<?> MY_STOP_WORDS_SET;
+	  
+	  static {
+	    List<String> stopWords = Arrays.asList(
+	      "a", "an", "and", "are", "as", "at", "be", "but", "by",
+	      "for", "if", "in", "into", "is", "it",
+	      "no", "not", "of", "on", "or", "such",
+	      "that", "the", "their", "then", "there", "these",
+	      "they", "this", "to", "was", "will", "with",
+	      "d", "t", "i", "like", "want"
+	    );
+	    CharArraySet stopSet = new CharArraySet(Version.LUCENE_31, 
+	        stopWords.size(), false);
+	    stopSet.addAll(stopWords);  
+	    MY_STOP_WORDS_SET = CharArraySet.unmodifiableSet(stopSet); 
+	  }
+	  // modified by Ning end 2
 	
 	protected final Log logger = LogFactory.getLog(getClass());
 	
 	public LuceneSearchService () {
-		analyzer = new StandardAnalyzer();
+		// modified by Ning start 3
+		//analyzer = new StandardAnalyzer();
+		analyzer = new StandardAnalyzer(MY_STOP_WORDS_SET);
+		// modified by Ning end 3
 	}
 	
 	public SearchInfo search(String searchQuery, int numResults) {
